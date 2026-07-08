@@ -2,22 +2,28 @@
   {
     "id": 1,
     "display_name": "MacBook Pro",
+    "email": "",
     "camera": true,
     "speaking_duration": 12,
-    "joined": "10:00"
+    "joined": "10:00",
+    "transcript": "Hello everyone"
   },
   {
     "id": 2,
     "display_name": "Rahul Sharma",
+    "email": "rahul@example.com",
     "camera": true,
     "speaking_duration": 58,
-    "joined": "09:59"
+    "joined": "09:58",
+    "transcript": "Hi everyone, I'm Rahul Sharma."
   },
   {
     "id": 3,
     "display_name": "Observer",
+    "email": "",
     "camera": false,
     "speaking_duration": 0,
-    "joined": "10:02"
+    "joined": "10:03",
+    "transcript": ""
   }
 ]
