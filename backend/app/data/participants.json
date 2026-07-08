@@ -1,0 +1,23 @@
+[
+  {
+    "id": 1,
+    "display_name": "MacBook Pro",
+    "camera": true,
+    "speaking_duration": 12,
+    "joined": "10:00"
+  },
+  {
+    "id": 2,
+    "display_name": "Rahul Sharma",
+    "camera": true,
+    "speaking_duration": 58,
+    "joined": "09:59"
+  },
+  {
+    "id": 3,
+    "display_name": "Observer",
+    "camera": false,
+    "speaking_duration": 0,
+    "joined": "10:02"
+  }
+]
