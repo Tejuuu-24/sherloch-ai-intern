@@ -1,73 +1,181 @@
+# import json
+# from pathlib import Path
+
+# # Get the data folder path
+# DATA_DIR = Path(__file__).parent.parent / "data"
+
+
+# def identify_candidate():
+#     """
+#     Reads participant and candidate data,
+#     calculates confidence score,
+#     and returns the most likely candidate.
+#     """
+
+#     # Read participants
+#     with open(DATA_DIR / "participants.json", "r") as f:
+#         participants = json.load(f)
+
+#     # Read candidate profile
+#     with open(DATA_DIR / "candidate.json", "r") as f:
+#         candidate = json.load(f)
+
+#     # Find highest speaking duration
+#     highest_speaking = max(
+#         participant["speaking_duration"] for participant in participants
+#     )
+
+#     best_candidate = None
+#     best_score = -1
+#     best_evidence = []
+
+#     # Loop through every participant
+#     for participant in participants:
+
+#         score = 0
+#         evidence = []
+
+#         # Rule 1 - Display name match
+#         if participant["display_name"].lower() == candidate["name"].lower():
+#             score += 30
+#             evidence.append("Display name matched")
+
+#         # Rule 2 - Email match
+#         if participant["email"].lower() == candidate["email"].lower():
+#             score += 30
+#             evidence.append("Candidate email matched")
+
+#         # Rule 3 - Camera ON
+#         if participant["camera"]:
+#             score += 10
+#             evidence.append("Camera active")
+
+#         # Rule 4 - Highest speaking duration
+#         if participant["speaking_duration"] == highest_speaking:
+#             score += 20
+#             evidence.append("Highest speaking duration")
+
+#         # Rule 5 - Transcript contains candidate name
+#         if candidate["name"].lower() in participant["transcript"].lower():
+#             score += 10
+#             evidence.append("Introduced themselves")
+
+#         # Save highest scoring participant
+#         if score > best_score:
+#             best_score = score
+#             best_candidate = participant
+#             best_evidence = evidence
+
+#     return {
+#         "candidate": best_candidate["display_name"],
+#         "confidence": best_score,
+#         "evidence": best_evidence
+#     }
+
 import json
 from pathlib import Path
+from typing import Dict, List
 
-# Get the data folder path
+# -----------------------------
+# Configuration
+# -----------------------------
 DATA_DIR = Path(__file__).parent.parent / "data"
 
+NAME_SCORE = 30
+EMAIL_SCORE = 30
+CAMERA_SCORE = 10
+SPEAKING_SCORE = 20
+TRANSCRIPT_SCORE = 10
 
-def identify_candidate():
+
+def load_json(filename: str):
+    """Load JSON file from the data folder."""
+    with open(DATA_DIR / filename, "r", encoding="utf-8") as file:
+        return json.load(file)
+
+
+def identify_candidate() -> Dict:
     """
-    Reads participant and candidate data,
-    calculates confidence score,
-    and returns the most likely candidate.
+    Identifies the most likely interview candidate using
+    multiple evidence signals.
     """
 
-    # Read participants
-    with open(DATA_DIR / "participants.json", "r") as f:
-        participants = json.load(f)
+    # -----------------------------
+    # Load data
+    # -----------------------------
+    participants = load_json("participants.json")
+    candidate = load_json("candidate.json")
 
-    # Read candidate profile
-    with open(DATA_DIR / "candidate.json", "r") as f:
-        candidate = json.load(f)
+    # Handle empty participant list
+    if not participants:
+        return {
+            "candidate": None,
+            "confidence": 0,
+            "evidence": [],
+            "reason": "No participants found."
+        }
 
-    # Find highest speaking duration
+    # Highest speaking duration
     highest_speaking = max(
-        participant["speaking_duration"] for participant in participants
+        participant["speaking_duration"]
+        for participant in participants
     )
 
     best_candidate = None
     best_score = -1
-    best_evidence = []
+    best_evidence: List[str] = []
 
-    # Loop through every participant
+    # -----------------------------
+    # Score every participant
+    # -----------------------------
     for participant in participants:
 
         score = 0
         evidence = []
 
-        # Rule 1 - Display name match
-        if participant["display_name"].lower() == candidate["name"].lower():
-            score += 30
+        # Display Name Match
+        if participant["display_name"].strip().lower() == candidate["name"].strip().lower():
+            score += NAME_SCORE
             evidence.append("Display name matched")
 
-        # Rule 2 - Email match
-        if participant["email"].lower() == candidate["email"].lower():
-            score += 30
+        # Email Match
+        if participant["email"].strip().lower() == candidate["email"].strip().lower():
+            score += EMAIL_SCORE
             evidence.append("Candidate email matched")
 
-        # Rule 3 - Camera ON
+        # Camera Status
         if participant["camera"]:
-            score += 10
+            score += CAMERA_SCORE
             evidence.append("Camera active")
 
-        # Rule 4 - Highest speaking duration
+        # Highest Speaking Duration
         if participant["speaking_duration"] == highest_speaking:
-            score += 20
+            score += SPEAKING_SCORE
             evidence.append("Highest speaking duration")
 
-        # Rule 5 - Transcript contains candidate name
+        # Transcript Match
         if candidate["name"].lower() in participant["transcript"].lower():
-            score += 10
+            score += TRANSCRIPT_SCORE
             evidence.append("Introduced themselves")
 
-        # Save highest scoring participant
+        # Save best candidate
         if score > best_score:
             best_score = score
             best_candidate = participant
             best_evidence = evidence
 
+    # -----------------------------
+    # Generate Explanation
+    # -----------------------------
+    reason = (
+        f"{best_candidate['display_name']} was selected because "
+        + ", ".join(best_evidence).lower()
+        + "."
+    )
+
     return {
         "candidate": best_candidate["display_name"],
         "confidence": best_score,
-        "evidence": best_evidence
+        "evidence": best_evidence,
+        "reason": reason
     }
