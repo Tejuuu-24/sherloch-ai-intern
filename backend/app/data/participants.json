@@ -1,26 +1,20 @@
 [
   {
-    "id": 1,
     "display_name": "Tejaswini Sanam",
-    "email": "tejaswini@example.com",
-    "video": "participant1.mp4",
-    "transcript": "participant1.txt",
-    "speaking_duration": 28
+    "email": "tejaswini@gmail.com",
+    "camera": true,
+    "video": "candidate.mp4"
   },
   {
-    "id": 2,
-    "display_name": "Priya",
-    "email": "priya@example.com",
-    "video": "participant2.mp4",
-    "transcript": "participant2.txt",
-    "speaking_duration": 12
+    "display_name": "Interviewer",
+    "email": "interviewer@gmail.com",
+    "camera": true,
+    "video": "interviewer.mp4"
   },
   {
-    "id": 3,
     "display_name": "Observer",
-    "email": "observer@example.com",
-    "video": "participant3.mp4",
-    "transcript": "participant3.txt",
-    "speaking_duration": 5
+    "email": "observer@gmail.com",
+    "camera": true,
+    "video": "observer.mp4"
   }
-]
+]   

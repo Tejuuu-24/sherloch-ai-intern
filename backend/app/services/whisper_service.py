@@ -5,9 +5,12 @@ from pathlib import Path
 # Load Whisper Model
 # -----------------------------
 
-# small is a good balance between speed and accuracy
+# tiny = fastest
+# base = recommended
+# small = better accuracy
+
 model = WhisperModel(
-    "small",
+    "base",
     device="cpu",
     compute_type="int8"
 )
@@ -21,10 +24,17 @@ TRANSCRIPT_DIR.mkdir(exist_ok=True)
 
 def generate_transcript(video_name):
     """
-    Converts speech from a video into text and saves it.
+    Converts speech from a video into text.
+
+    Returns:
+        transcript (str)
     """
 
     video_path = MEDIA_DIR / video_name
+
+    if not video_path.exists():
+
+        return ""
 
     segments, info = model.transcribe(
         str(video_path),

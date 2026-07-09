@@ -2,19 +2,30 @@ NAME_SCORE = 30
 EMAIL_SCORE = 30
 CAMERA_SCORE = 10
 
+
 def metadata_score(participant, candidate):
+
     score = 0
     evidence = []
 
-    if participant["display_name"].lower() == candidate["name"].lower():
+    # Display Name Match
+    if (
+        participant["display_name"].lower()
+        == candidate["name"].lower()
+    ):
         score += NAME_SCORE
         evidence.append("Display name matched")
 
-    if participant["email"].lower() == candidate["email"].lower():
+    # Email Match
+    if (
+        participant["email"].lower()
+        == candidate["email"].lower()
+    ):
         score += EMAIL_SCORE
         evidence.append("Candidate email matched")
 
-    if participant["camera"]:
+    # Camera Status
+    if participant.get("camera", False):
         score += CAMERA_SCORE
         evidence.append("Camera active")
 

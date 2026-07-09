@@ -5,13 +5,19 @@ from pathlib import Path
 # -----------------------------
 # Load YOLO Model
 # -----------------------------
-
 model = YOLO("yolov8n.pt")
 
 MEDIA_DIR = Path(__file__).parent.parent / "media"
 
 
 def vision_score(video_name):
+    """
+    Detects whether a participant is visible throughout the meeting.
+
+    Returns:
+        score (int)
+        evidence (list)
+    """
 
     video_path = MEDIA_DIR / video_name
 
@@ -25,6 +31,8 @@ def vision_score(video_name):
 
     max_people = 0
 
+    frame_number = 0
+
     while True:
 
         success, frame = cap.read()
@@ -32,9 +40,15 @@ def vision_score(video_name):
         if not success:
             break
 
+        frame_number += 1
+
+        # Process every 10th frame
+        if frame_number % 10 != 0:
+            continue
+
         total_frames += 1
 
-        results = model(frame, verbose=False)
+        results = model.predict(frame, verbose=False)
 
         people_in_frame = 0
 
@@ -45,7 +59,6 @@ def vision_score(video_name):
                 cls = int(box.cls[0])
 
                 # COCO Class 0 = Person
-
                 if cls == 0:
 
                     people_in_frame += 1
@@ -61,12 +74,7 @@ def vision_score(video_name):
 
     cap.release()
 
-    # -----------------------------
-    # Empty Video
-    # -----------------------------
-
     if total_frames == 0:
-
         return (
             0,
             [
@@ -74,24 +82,12 @@ def vision_score(video_name):
             ]
         )
 
-    # -----------------------------
-    # Visibility
-    # -----------------------------
-
     visibility = (detected_frames / total_frames) * 100
-
-    # -----------------------------
-    # Average Confidence
-    # -----------------------------
 
     if confidence_count == 0:
         avg_confidence = 0
     else:
         avg_confidence = confidence_sum / confidence_count
-
-    # -----------------------------
-    # Score
-    # -----------------------------
 
     score = 0
 
@@ -107,30 +103,15 @@ def vision_score(video_name):
     if avg_confidence >= 0.90:
         score += 5
 
-    # -----------------------------
-    # Evidence
-    # -----------------------------
-
-    evidence = []
-
-    evidence.append(
-        f"Participant visible in {visibility:.1f}% of frames"
-    )
-
-    evidence.append(
+    evidence = [
+        f"Participant visible in {visibility:.1f}% of sampled frames",
         f"Average detection confidence: {avg_confidence:.2f}"
-    )
+    ]
 
     if max_people == 1:
-
-        evidence.append(
-            "Single participant detected throughout meeting"
-        )
+        evidence.append("Single participant detected")
 
     elif max_people > 1:
-
-        evidence.append(
-            "Multiple participants appeared in the video"
-        )
+        evidence.append("Multiple participants detected")
 
     return score, evidence
