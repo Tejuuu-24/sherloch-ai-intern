@@ -1,0 +1,1 @@
+Good morning everyone. My name is Tejaswini Sanam. Thank you for giving me this opportunity. I am a final-year B.Tech student specializing in Artificial Intelligence and Machine Learning. Recently I have been building AI applications using FastAPI and Large Language Models. I'm excited to discuss my experience today.
