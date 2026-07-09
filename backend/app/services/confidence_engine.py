@@ -262,7 +262,7 @@ def identify_candidate():
         # Vision Analysis
         # -----------------------------
         vision_points, vision_evidence = vision_score(
-            participant
+            participant["video"]
         )
 
         score += vision_points
