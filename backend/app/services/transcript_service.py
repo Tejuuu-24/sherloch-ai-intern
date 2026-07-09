@@ -1,15 +1,21 @@
-TRANSCRIPT_SCORE = 10
+from pathlib import Path
 
-def transcript_score(participant, candidate):
+from app.services.llm_service import generate_reason
 
-    score = 0
-    evidence = []
+TRANSCRIPT_DIR = Path(__file__).parent.parent / "transcripts"
 
-    transcript = participant["transcript"].lower()
 
-    if candidate["name"].lower() in transcript:
+def transcript_score(participant):
 
-        score += TRANSCRIPT_SCORE
-        evidence.append("Introduced themselves")
+    transcript_file = TRANSCRIPT_DIR / participant["transcript"]
 
-    return score, evidence
+    with open(transcript_file, "r", encoding="utf-8") as f:
+        transcript = f.read()
+
+    result = generate_reason(transcript)
+
+    evidence = [
+        result["reason"]
+    ]
+
+    return result["score"], evidence

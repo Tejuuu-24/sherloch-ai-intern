@@ -251,8 +251,7 @@ def identify_candidate():
         # Transcript Analysis
         # -----------------------------
         transcript_points, transcript_evidence = transcript_score(
-            participant,
-            candidate
+            participant
         )
 
         score += transcript_points

@@ -1,31 +1,56 @@
 import os
+import json
 import google.generativeai as genai
 from dotenv import load_dotenv
 
 load_dotenv()
 
 genai.configure(api_key=os.getenv("GEMINI_API_KEY"))
-# genai.configure(api_key=GEMINI_API_KEY)
 
 model = genai.GenerativeModel("gemini-2.5-flash")
 
 
-def generate_reason(candidate_name, evidence):
+def generate_reason(transcript: str):
 
     prompt = f"""
-You are an AI interview assistant.
+You are an AI interview analyzer.
 
-Candidate:
-{candidate_name}
+Your task is NOT to evaluate the candidate.
 
-Evidence:
-{', '.join(evidence)}
+Your task is ONLY to determine whether this participant
+appears to be the interview candidate.
 
-Explain in exactly 2 professional sentences why this person is the most likely interview candidate.
+Analyze the transcript carefully.
 
-Do not mention confidence scores.
+Return ONLY valid JSON.
+
+Format:
+
+{{
+"is_candidate": true,
+"score": 20,
+"reason": "..."
+}}
+
+Scoring:
+
+20 = clearly interview candidate
+
+10 = possibly candidate
+
+0 = not candidate
+
+Transcript:
+
+{transcript}
 """
 
     response = model.generate_content(prompt)
 
-    return response.text
+    text = response.text.strip()
+
+    # Remove markdown if Gemini adds it
+    text = text.replace("```json", "")
+    text = text.replace("```", "")
+
+    return json.loads(text)
