@@ -188,13 +188,23 @@ from app.services.participant_service import (
 from app.services.metadata_service import metadata_score
 from app.services.transcript_service import transcript_score
 from app.services.vision_service import vision_score
+from app.services.llm_service import generate_reason
+
+# Maximum possible score
+MAX_SCORE = 120
 
 
 def identify_candidate():
+    """
+    Identifies the most likely interview candidate by combining
+    metadata, transcript, and vision-based evidence.
+    """
 
+    # Load data
     participants = load_participants()
     candidate = load_candidate()
 
+    # Handle empty participant list
     if not participants:
         return {
             "candidate": None,
@@ -203,6 +213,7 @@ def identify_candidate():
             "reason": "No participants found."
         }
 
+    # Find highest speaking duration
     highest_speaking = max(
         participant["speaking_duration"]
         for participant in participants
@@ -212,15 +223,15 @@ def identify_candidate():
     best_score = -1
     best_evidence = []
 
+    # Evaluate every participant
     for participant in participants:
 
         score = 0
         evidence = []
 
-        # --------------------
-        # Metadata Score
-        # --------------------
-
+        # -----------------------------
+        # Metadata Analysis
+        # -----------------------------
         metadata_points, metadata_evidence = metadata_score(
             participant,
             candidate
@@ -229,18 +240,16 @@ def identify_candidate():
         score += metadata_points
         evidence.extend(metadata_evidence)
 
-        # --------------------
+        # -----------------------------
         # Speaking Duration
-        # --------------------
-
+        # -----------------------------
         if participant["speaking_duration"] == highest_speaking:
             score += 20
             evidence.append("Highest speaking duration")
 
-        # --------------------
-        # Transcript Score
-        # --------------------
-
+        # -----------------------------
+        # Transcript Analysis
+        # -----------------------------
         transcript_points, transcript_evidence = transcript_score(
             participant,
             candidate
@@ -249,10 +258,9 @@ def identify_candidate():
         score += transcript_points
         evidence.extend(transcript_evidence)
 
-        # --------------------
-        # Vision Score
-        # --------------------
-
+        # -----------------------------
+        # Vision Analysis
+        # -----------------------------
         vision_points, vision_evidence = vision_score(
             participant
         )
@@ -260,26 +268,26 @@ def identify_candidate():
         score += vision_points
         evidence.extend(vision_evidence)
 
-        # --------------------
-        # Best Candidate
-        # --------------------
-
+        # -----------------------------
+        # Save Best Candidate
+        # -----------------------------
         if score > best_score:
-
             best_score = score
             best_candidate = participant
             best_evidence = evidence
 
+    # Convert raw score into percentage
+    confidence = round((best_score / MAX_SCORE) * 100)
+
+    # Generate explanation using Gemini
+    reason = generate_reason(
+        best_candidate["display_name"],
+        best_evidence
+    )
+
     return {
-
         "candidate": best_candidate["display_name"],
-
-        "confidence": best_score,
-
+        "confidence": confidence,
         "evidence": best_evidence,
-
-        "reason":
-        f"{best_candidate['display_name']} "
-        f"was selected because "
-        f"{', '.join(best_evidence).lower()}."
+        "reason": reason
     }
