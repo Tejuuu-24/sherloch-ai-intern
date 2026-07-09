@@ -1,0 +1,1 @@
+Good morning, my name is Sageshwini. Thank you for giving me this opportunity.  I am a final year BTEC student specializing in AI and machine learning.  I have worked on a drawings in a detection system using TensorFlow and OpenCV.  I enjoy solving AI engineering problems.

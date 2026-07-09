@@ -13,14 +13,24 @@ model = genai.GenerativeModel("gemini-2.5-flash")
 def generate_reason(transcript: str):
 
     prompt = f"""
-You are an AI interview analyzer.
+You are an AI system that identifies the interview candidate in a virtual interview.
 
-Your task is NOT to evaluate the candidate.
+You will receive a transcript generated from speech recognition.
 
-Your task is ONLY to determine whether this participant
-appears to be the interview candidate.
+Analyze carefully.
 
-Analyze the transcript carefully.
+Determine whether this participant is the interview candidate.
+
+Look for:
+
+• Self introduction
+• Education
+• Experience
+• Technical projects
+• Interview style answers
+• Responses to interviewer questions
+
+Do NOT judge technical ability.
 
 Return ONLY valid JSON.
 
@@ -29,16 +39,14 @@ Format:
 {{
 "is_candidate": true,
 "score": 20,
-"reason": "..."
+"confidence": 0.96,
+"reason":"...",
+"evidence":[
+"...",
+"...",
+"..."
+]
 }}
-
-Scoring:
-
-20 = clearly interview candidate
-
-10 = possibly candidate
-
-0 = not candidate
 
 Transcript:
 

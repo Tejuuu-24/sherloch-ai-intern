@@ -1,21 +1,17 @@
-from pathlib import Path
-
+from app.services.whisper_service import generate_transcript
 from app.services.llm_service import generate_reason
-
-TRANSCRIPT_DIR = Path(__file__).parent.parent / "transcripts"
 
 
 def transcript_score(participant):
 
-    transcript_file = TRANSCRIPT_DIR / participant["transcript"]
-
-    with open(transcript_file, "r", encoding="utf-8") as f:
-        transcript = f.read()
+    transcript = generate_transcript(
+        participant["video"]
+    )
 
     result = generate_reason(transcript)
 
-    evidence = [
-        result["reason"]
-    ]
+    evidence = result.get("evidence", [])
+
+    evidence.append(result["reason"])
 
     return result["score"], evidence
