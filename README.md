@@ -8,7 +8,7 @@ An AI-powered interview candidate identification system that analyzes multiple w
 
 🎥 Demo Video
 
-> 
+> https://drive.google.com/file/d/1SZjxG2tYOeQpLLah4X-4M5rqWcFLJm8X/view?usp=drive_link
 
 
 
